@@ -1,0 +1,3 @@
+ACL-Rehte setzen, damit Dateien und Ordner in schreibgeschützte Ordner kopiert werden können.
+
+sudo setfacl -R -m u:chris:rx /var/home/chris/kvm\ isos/ 
