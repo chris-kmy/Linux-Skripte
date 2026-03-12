@@ -1,0 +1,13 @@
+sudo rpm-ostree install qemu-kvm libvirt-daemon-kvm virt-install virt-manager virt-viewer libvirt-daemon-config-network
+
+systemctl reboot
+
+sudo systemctl enable --now libvirtd   
+
+sudo virsh net-autostart default
+
+#####
+
+virsh net-list --all
+
+##################### KVM für Fedora Silverblue ############
