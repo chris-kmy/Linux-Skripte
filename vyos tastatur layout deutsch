@@ -1,0 +1,4 @@
+configure
+set system option keyboard-layout de
+commit
+save   
