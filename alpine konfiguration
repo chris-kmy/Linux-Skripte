@@ -1,0 +1,37 @@
+######## ip forwarding in alpine aktivieren permanent ######
+
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+sysctl -p
+
+####################################
+
+### prüfen, ob ip-forwarding korrekt und dauerhaft funktioniert
+cat /proc/sys/net/ipv4/ip_forward
+
+#####################################
+
+#### iptables installieren
+
+apk add iptables
+
+### oder alternativ # damit werden die iptables auch nach den booten verfügbar
+
+apk add iptables iptables-openrc
+
+###### NAT einrichten
+
+# NAT aktivieren Masquerade für WAN
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+# Forwarding: LAN → WAN erlauben
+iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+
+# Forwarding: WAN → LAN nur für Antworten erlauben
+iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+######ips von Adaptern erneuern
+
+ip addr flush dev eth1
+ip addr add 192.168.50.1/24 dev eth1
+ip link set eth1 up
+
