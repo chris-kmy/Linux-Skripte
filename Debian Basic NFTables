@@ -54,8 +54,8 @@ sudo systemctl status nftables
 
 ####
 
-####✅ Default-Drop-Policy im input-Chain blockiert alle nicht explizit erlaubten Verbindungen. 
-####✅ Etablierte Verbindungen werden erlaubt, ausgehender Traffic bleibt offen. 
-####✅ Loopback und ICMP sind korrekt freigegeben. 
-####✅ Ungültige Pakete werden direkt verworfen. 
-####✅ SSH-Zugriff ist eingeschränkt auf Port 22.
+#### Default-Drop-Policy im input-Chain blockiert alle nicht explizit erlaubten Verbindungen. 
+#### Etablierte Verbindungen werden erlaubt, ausgehender Traffic bleibt offen. 
+#### Loopback und ICMP sind korrekt freigegeben. 
+#### Ungültige Pakete werden direkt verworfen. 
+#### SSH-Zugriff ist eingeschränkt auf Port 22.
