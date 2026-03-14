@@ -39,8 +39,7 @@ table inet filter {
         # tcp dport {80, 443} accept
 
         # Logging für sonstige geblockte Pakete
-        limit rate 3/minute burst 5 packets log prefix "NFT_DROP: " level warn
-        drop
+        limit rate 3/minute burst 5 packets log prefix "NFT_DROP: " drop
     }
 
     chain forward {
@@ -54,8 +53,25 @@ table inet filter {
 
 ####
 
+#### NFTables starten und Regeln anzeigen
+
 sudo nft -f /etc/nftables.conf
 sudo systemctl enable --now nftables
 sudo nft list ruleset
 
 ####
+
+#### flush ruleset – Löscht alle bestehenden Regeln, um Doppelungen zu vermeiden.
+#### table inet filter – Erstellt eine Tabelle für IPv4 und IPv6.
+#### chain input – Definiert die Eingangsregeln für Pakete an diesen Host.
+#### type filter hook input priority filter; policy drop – Blockt alles, was nicht erlaubt ist.
+#### iifname "lo" accept – Erlaubt lokalen Verkehr (127.0.0.1).
+#### ct state established,related accept – Erlaubt Antworten auf eigene Ausgangsverbindungen.
+#### ct state invalid drop – Blockt fehlerhafte Pakete.
+#### ip protocol icmp accept – Erlaubt Ping (ICMP) für IPv4.
+#### ip6 nexthdr ipv6-icmp accept – Erlaubt ICMPv6 (Ping, Neighbor Discovery) für IPv6.
+#### tcp dport 22 ct state new limit rate 3/minute burst 3 packets log prefix "SSH-brute: " drop – Loggt und blockt SSH-Brute-Force-Versuche.
+#### tcp dport 22 accept – Erlaubt normale SSH-Verbindungen.
+#### limit rate 3/minute burst 5 packets log prefix "NFT_DROP: " drop – Loggt und blockt alle anderen nicht erlaubten Pakete, um Log-Überflutung zu vermeiden.
+#### chain forward { policy drop } – Blockt Weiterleitung von Paketen (sicher, da VM hinter Router).
+#### chain output { policy accept } – Erlaubt alle ausgehenden Verbindungen (Standardverhalten).
