@@ -1,0 +1,61 @@
+#### NFTables-Installation
+
+sudo apt update
+sudo apt install nftables
+sudo systemctl enable nftables
+sudo systemctl start nftables
+
+#### Hauptkonfigurationsdatei bearbeiten
+
+sudo nano /etc/nftables.conf
+
+####
+
+#!/usr/sbin/nft -f
+flush ruleset
+
+table inet filter {
+    chain input {
+        type filter hook input priority 0; policy drop;
+
+        # Etablierte und verwandte Verbindungen erlauben
+        ct state established,related accept
+        ct state invalid drop
+
+        # Loopback erlauben
+        iifname "lo" accept
+
+        # ICMP (Ping, Fehlermeldungen) erlauben
+        ip protocol icmp accept
+        ip6 nexthdr icmpv6 accept
+
+        # SSH-Zugriff erlauben (nur wenn benötigt)
+        tcp dport 22 accept
+    }
+
+    chain forward {
+        type filter hook forward priority 0; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority 0; policy accept;
+    }
+}
+####
+
+#### Konfigurationen laden
+
+sudo nft -f /etc/nftables.conf
+
+####
+
+sudo nft list ruleset
+sudo systemctl status nftables
+
+####
+
+####✅ Default-Drop-Policy im input-Chain blockiert alle nicht explizit erlaubten Verbindungen. 
+####✅ Etablierte Verbindungen werden erlaubt, ausgehender Traffic bleibt offen. 
+####✅ Loopback und ICMP sind korrekt freigegeben. 
+####✅ Ungültige Pakete werden direkt verworfen. 
+####✅ SSH-Zugriff ist eingeschränkt auf Port 22.
