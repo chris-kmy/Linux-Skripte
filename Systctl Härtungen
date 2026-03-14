@@ -1,0 +1,93 @@
+####
+
+nano /etc/sysctl.d/999-hardening.conf
+
+####
+
+###############################################
+#  Netzwerk-Hardening – Kombinierte Version  #
+#  Sicher, stabil, ohne Funktionsverlust     #
+###############################################
+
+########## 1. Forwarding deaktivieren ##########
+net.ipv4.ip_forward = 0
+net.ipv6.conf.all.forwarding = 0
+
+########## 2. Redirects deaktivieren ##########
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.*.accept_redirects = 0
+
+net.ipv4.conf.all.secure_redirects = 0
+net.ipv4.conf.default.secure_redirects = 0
+net.ipv4.conf.*.secure_redirects = 0
+
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+net.ipv4.conf.*.send_redirects = 0
+
+net.ipv6.conf.all.accept_redirects = 0
+net.ipv6.conf.default.accept_redirects = 0
+net.ipv6.conf.*.accept_redirects = 0
+
+########## 3. Source Routing deaktivieren ##########
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv4.conf.*.accept_source_route = 0
+
+net.ipv6.conf.all.accept_source_route = 0
+net.ipv6.conf.default.accept_source_route = 0
+net.ipv6.conf.*.accept_source_route = 0
+
+########## 4. Martian Logging ##########
+net.ipv4.conf.all.log_martians = 1
+net.ipv4.conf.default.log_martians = 1
+net.ipv4.conf.*.log_martians = 1
+
+########## 5. ICMP-Hardening ##########
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+net.ipv4.icmp_ignore_bogus_error_responses = 1
+
+########## 6. TCP-Hardening ##########
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_rfc1337 = 1
+net.ipv4.tcp_timestamps = 1
+
+########## 7. Reverse Path Filtering ##########
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+
+########## 8. ARP-Hardening ##########
+net.ipv4.conf.all.arp_ignore = 2
+net.ipv4.conf.all.arp_announce = 2
+
+########## 9. IPv6 Privacy Extensions ##########
+net.ipv6.conf.all.use_tempaddr = 2
+net.ipv6.conf.default.use_tempaddr = 2
+
+##########
+#### Befehle zum prüfen:
+
+sudo sysctl --system
+
+###########
+
+#### net.ipv4.ip_forward = 0 – Deaktiviert IP-Weiterleitung (kein Router).
+#### net.ipv6.conf.all.forwarding = 0 – Gleiche Regel für IPv6.
+#### net.ipv4.conf.all.accept_redirects = 0 – Blockt ICMP-Redirects (verhindert Routing-Manipulation).
+#### net.ipv4.conf.all.secure_redirects = 0 – Akzeptiert nur Redirects von bekannten Gateways (hier deaktiviert für maximale Sicherheit).
+#### net.ipv4.conf.all.send_redirects = 0 – VM sendet keine Redirects (kein Router).
+#### net.ipv6.conf.all.accept_redirects = 0 – IPv6-Redirects blockiert.
+#### net.ipv4.conf.all.accept_source_route = 0 – Verbietet Quellrouten (Schutz vor IP-Spoofing).
+#### net.ipv6.conf.all.accept_source_route = 0 – Gleiche Regel für IPv6.
+#### net.ipv4.conf.all.log_martians = 1 – Loggt Pakete mit ungültigen Quell-IPs (z. B. 0.0.0.0).
+#### net.ipv4.icmp_echo_ignore_broadcasts = 1 – Ignoriert Ping an Broadcast-Adressen (Schutz vor Smurf-Angriffen).
+#### net.ipv4.icmp_ignore_bogus_error_responses = 1 – Blockt falsche ICMP-Fehlermeldungen.
+#### net.ipv4.tcp_syncookies = 1 – Schutz gegen SYN-Flood-Angriffe.
+#### net.ipv4.tcp_rfc1337 = 1 – Schützt vor bestimmten TCP-Timing-Angriffen.
+#### net.ipv4.tcp_timestamps = 1 – Erlaubt Timestamps (für Leistung, leichtes Sicherheitsrisiko, aber in VM o.k.).
+#### net.ipv4.conf.all.rp_filter = 1 – Aktiviert Reverse Path Filter (strict mode): Antwortet nur, wenn der Rückweg über dieselbe Schnittstelle geht (Schutz vor Spoofing).
+#### net.ipv4.conf.all.arp_ignore = 2 – Antwortet auf ARP-Anfragen nur, wenn die IP auf der eingehenden Schnittstelle konfiguriert ist.
+#### net.ipv4.conf.all.arp_announce = 2 – Sendet ARP-Antworten nur über die passende Schnittstelle.
+#### net.ipv6.conf.all.use_tempaddr = 2 – Nutzt temporäre IPv6-Adressen (verbessert Privatsphäre).
+#### net.ipv6.conf.default.use_tempaddr = 2 – Gleiche Regel für neue Schnittstellen. 
