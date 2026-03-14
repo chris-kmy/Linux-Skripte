@@ -1,0 +1,44 @@
+#### NFTables für Debian in einer Vm unter KVM in Debian als Host-System, optimiert für die Benutzung in Kombination mit einem Alpine Linux als Router 
+
+
+
+####
+#!/usr/sbin/nft -f
+
+flush ruleset
+
+table inet filter {
+    chain input {
+        type filter hook input priority filter; policy drop;
+
+        # Loopback erlauben
+        iifname "lo" accept
+
+        # Etablierte Verbindungen erlauben
+        ct state established,related accept
+        ct state invalid drop
+
+        # ICMP und ICMPv6 (Ping, Router Advertisements)
+        ip protocol icmp accept
+        ip6 nexthdr ipv6-icmp accept
+
+        # SSH mit Brute-Force-Schutz (anpassen, falls Port anders)
+        tcp dport 22 ct state new limit rate 3/minute burst 3 packets log prefix "SSH-brute: " level warn drop
+        tcp dport 22 accept
+
+        # Optional: Wenn du HTTP/HTTPS-Server in der VM hostest
+        # tcp dport {80, 443} accept
+
+        # Logging für sonstige geblockte Pakete
+        limit rate 3/minute burst 5 packets log prefix "NFT_DROP: " level warn
+        drop
+    }
+
+    chain forward {
+        type filter hook forward priority filter; policy drop;
+    }
+
+    chain output {
+        type filter hook output priority filter; policy accept;
+    }
+}   
