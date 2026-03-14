@@ -1,6 +1,15 @@
-#### NFTables für Debian in einer Vm unter KVM in Debian als Host-System, optimiert für die Benutzung in Kombination mit einem Alpine Linux als Router 
+#### NFTables für Debian in einer Vm unter KVM (Debian als Host-System), optimiert für die Benutzung in Kombination mit einem Alpine Linux als Router 
 
+#### NFTables-Installation
 
+sudo apt update
+sudo apt install nftables
+sudo systemctl enable nftables
+sudo systemctl start nftables
+
+#### Hauptkonfigurationsdatei bearbeiten
+
+sudo nano /etc/nftables.conf
 
 ####
 #!/usr/sbin/nft -f
@@ -41,4 +50,12 @@ table inet filter {
     chain output {
         type filter hook output priority filter; policy accept;
     }
-}   
+}
+
+####
+
+sudo nft -f /etc/nftables.conf
+sudo systemctl enable --now nftables
+sudo nft list ruleset
+
+####
