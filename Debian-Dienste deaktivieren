@@ -1,0 +1,34 @@
+#### Dienste deaktivieren
+
+# Drucker (CUPS)
+sudo systemctl disable --now cups.service
+sudo systemctl disable --now cups-browsed.service
+
+# Avahi (mDNS / Bonjour)
+sudo systemctl disable --now avahi-daemon.service
+
+# ModemManager (LTE/UMTS)
+sudo systemctl disable --now ModemManager.service
+
+# GPU-Switching (nur Laptops)
+sudo systemctl disable --now switcheroo-control.service
+
+# Bluetooth
+sudo systemctl disable --now bluetooth.service
+sudo systemctl disable --now blueman-mechanism.service
+
+#### Avahi wird oft von anderen Diensten (z. B. cups-browsed) benötigt und kann dadurch trotz disable beim Boot wieder starten. Daher zusätzlich deaktivieren:
+
+sudo systemctl disable --now avahi-daemon.socket   
+
+#### Wie in der Quelle beschrieben, „wants“ cups-browsed.service den avahi-daemon.service. Um sicherzustellen, dass Avahi nicht gestartet wird, ist dein Befehl:
+
+sudo systemctl disable --now cups-browsed.service
+
+#### Befehle zum prüfen:
+
+systemctl list-unit-files --type=service | grep -E "(cups|avahi|ModemManager|bluetooth|switcheroo)"   
+
+systemctl is-active cups.service cups-browsed.service avahi-daemon.service ModemManager.service bluetooth.service blueman-mechanism.service switcheroo-control.service   
+
+systemctl is-enabled cups.service cups-browsed.service avahi-daemon.service ModemManager.service bluetooth.service blueman-mechanism.service switcheroo-control.service   
