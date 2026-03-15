@@ -1,0 +1,52 @@
+#### Firejail installieren
+
+sudo apt install firejail
+
+####
+
+#### Profil erstellen
+
+mkdir -p ~/.config/firejail
+nano ~/.config/firejail/firefox.profile
+
+##### Inhalt unten einfügen
+
+# Firefox Profil – Starkes Hardening
+
+include /etc/firejail/disable-common.inc
+include /etc/firejail/disable-programs.inc
+include /etc/firejail/disable-passwdmgr.inc
+include /etc/firejail/whitelist-common.inc
+
+# Binärpfad freigeben
+whitelist /usr/share/firefox
+whitelist ${HOME}/.mozilla
+whitelist ${HOME}/.cache/mozilla
+mkdir ${HOME}/.mozilla/firefox
+mkdir ${HOME}/.cache/mozilla/firefox
+
+# Sicherheit
+caps.drop all
+seccomp
+protocol unix,inet,inet6
+nonewprivs
+shell none
+net none
+
+# Isolation
+private-tmp
+private-dev
+private-etc passwd,group
+
+# Blacklist sensible Orte
+blacklist ${HOME}/.ssh
+blacklist ${HOME}/.gnupg
+blacklist /boot
+blacklist /srv
+blacklist /opt
+
+####
+
+#### Firejail in der Bash starten
+
+firejail firefox   
