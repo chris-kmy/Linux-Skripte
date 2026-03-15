@@ -75,6 +75,8 @@ kernel.printk = 3 4 1 3
 
 ########### Ende des Skripts ###########
 
+#### str + 0 (speichern) und dann str + x (verlassen)
+
 ##### und dann mit folgendem Befehl aktivieren
 
 sudo sysctl --system
