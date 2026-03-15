@@ -11,34 +11,36 @@ sudo systemctl start nftables
 
 sudo nano /etc/nftables.conf
 
-####
 #!/usr/sbin/nft -f
 
 flush ruleset
 
 table inet filter {
+
     chain input {
         type filter hook input priority filter; policy drop;
+
+        # Ungültige Pakete sofort verwerfen
+        ct state invalid drop
+
+        # Bereits etablierte Verbindungen erlauben
+        ct state established,related accept
 
         # Loopback erlauben
         iifname "lo" accept
 
-        # Etablierte Verbindungen erlauben
-        ct state established,related accept
-        ct state invalid drop
-
-        # ICMP und ICMPv6 (Ping, Router Advertisements)
+        # ICMP (Ping) erlauben
         ip protocol icmp accept
         ip6 nexthdr ipv6-icmp accept
 
-        # SSH mit Brute-Force-Schutz (anpassen, falls Port anders)
-        tcp dport 22 ct state new limit rate 3/minute burst 3 packets log prefix "SSH-brute: " level warn drop
-        tcp dport 22 accept
+        # SSH mit Rate-Limit (Brute-Force-Schutz)
+        tcp dport 22 ct state new limit rate 10/minute accept
+        tcp dport 22 log prefix "SSH_DROP: " level warn drop
 
-        # Optional: Wenn du HTTP/HTTPS-Server in der VM hostest
+        # Optional: Webserver
         # tcp dport {80, 443} accept
 
-        # Logging für sonstige geblockte Pakete
+        # Logging für andere geblockte Pakete
         limit rate 3/minute burst 5 packets log prefix "NFT_DROP: " drop
     }
 
