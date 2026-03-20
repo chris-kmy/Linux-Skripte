@@ -29,9 +29,27 @@ iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
 # Forwarding: WAN → LAN nur für Antworten erlauben
 iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
 
-######ips von Adaptern erneuern
+######ips von Adaptern erneuern (temprär, nicht dauerhaft)
 
 ip addr flush dev eth1
 ip addr add 192.168.50.1/24 dev eth1
 ip link set eth1 up
+
+####dauerhaft aktivieren
+
+apk update
+apk add nano
+nano /etc/network/interfaces
+auto eth0
+iface eth0 inet static
+    address 192.168.1.100/24
+    gateway 192.168.1.1
+    dns-nameservers 8.8.8.8 
+
+
+
+
+
+
+
 
